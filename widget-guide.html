@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Rotina — Guia Widget iOS</title>
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #141414; --border: #272727;
+    --text: #f0ece4; --muted: #666; --accent: #c8f065;
+    --font-mono: 'Geist Mono', monospace; --font-serif: 'Instrument Serif', Georgia, serif;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-mono); padding:32px 20px 60px; max-width:560px; margin:0 auto; }
+  h1 { font-family:var(--font-serif); font-size:2rem; letter-spacing:-0.03em; margin-bottom:8px; }
+  .sub { color:var(--muted); font-size:0.8rem; margin-bottom:32px; }
+  .step { display:flex; gap:16px; margin-bottom:24px; }
+  .num { background:var(--accent); color:#0a0a0a; font-size:0.75rem; font-weight:700;
+         width:28px; height:28px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; flex-shrink:0; margin-top:2px; }
+  .step-body h3 { font-size:0.9rem; margin-bottom:6px; }
+  .step-body p  { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+  code { background:var(--surface); border:1px solid var(--border); border-radius:6px;
+         padding:2px 8px; font-size:0.78rem; color:var(--accent); }
+  .box { background:var(--surface); border:1px solid var(--border); border-radius:14px;
+         padding:16px 20px; margin:24px 0; }
+  .box h4 { font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  pre { font-size:0.78rem; color:var(--text); line-height:1.6; white-space:pre-wrap; word-break:break-all; }
+  .tip { font-size:0.75rem; color:var(--muted); margin-top:8px; font-style:italic; }
+  .divider { height:1px; background:var(--border); margin:32px 0; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<h1>Widget iOS</h1>
+<p class="sub">Como adicionar a Rotina à tela inicial como widget usando Atalhos</p>
+
+<div class="step">
+  <div class="num">1</div>
+  <div class="step-body">
+    <h3>Instale o app na tela inicial</h3>
+    <p>Abra o app Rotina no Safari → toque em <code>Compartilhar</code> → <code>Adicionar à Tela de Início</code>. Isso é obrigatório para o widget funcionar.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">2</div>
+  <div class="step-body">
+    <h3>Abra o app Atalhos</h3>
+    <p>No seu iPhone, abra o app <code>Atalhos</code> (pré-instalado). Toque em <code>+</code> para criar um novo atalho.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">3</div>
+  <div class="step-body">
+    <h3>Adicione a ação "Obter conteúdo de URL"</h3>
+    <p>Pesquise por <code>Obter conteúdo de URL</code> e adicione a ação. Na URL, insira o endereço do seu app Rotina (ex: <code>https://seuapp.com</code>).</p>
+    <p class="tip">Isso vai carregar a página e permitir extrair dados do localStorage via JavaScript.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">4</div>
+  <div class="step-body">
+    <h3>Use "Executar JavaScript no Safari" (alternativa mais simples)</h3>
+    <p>Adicione a ação <code>Abrir URLs</code> apontando para o app. Para um widget de texto simples, use o atalho de <code>Scriptable</code> (app gratuito) que lê o localStorage:</p>
+  </div>
+</div>
+
+<div class="box">
+  <h4>Script para Scriptable (widget)</h4>
+  <pre>// Cole no app Scriptable como widget
+const url = "https://seuapp.com"
+const req = new Request(url)
+const html = await req.loadString()
+
+// Extrai dados do rotina_widget salvo no localStorage
+// (requer que o app esteja aberto ao menos uma vez)
+const wm = importModule("no-background")
+const widget = new ListWidget()
+widget.backgroundColor = new Color("#0a0a0a")
+
+const title = widget.addText("Rotina")
+title.textColor = new Color("#c8f065")
+title.font = Font.boldMonospacedSystemFont(12)
+
+widget.addSpacer(4)
+const sub = widget.addText("Abra o app para ver")
+sub.textColor = new Color("#555555")
+sub.font = Font.monospacedSystemFont(11)
+
+Script.setWidget(widget)
+widget.presentSmall()</pre>
+</div>
+
+<div class="divider"></div>
+
+<div class="box">
+  <h4>Opção mais simples: Widget de atalho</h4>
+  <pre>1. Crie um atalho que abre o app Rotina
+2. Na tela inicial, segure → Editar → +
+3. Procure "Atalhos" na lista de widgets
+4. Escolha o atalho criado
+5. Isso cria um botão que abre o app direto na tela atual</pre>
+</div>
+
+<p class="tip">💡 O app Rotina já expõe os dados da tarefa atual em <code>localStorage["rotina_widget"]</code> como JSON. Apps como Scriptable conseguem ler isso via WebView para montar widgets nativos.</p>
+
+</body>
+</html>

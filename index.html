@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Rotina"/>
+  <meta name="theme-color" content="#04080f"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <title>KOUDO IKUSEI — Sistema de Rotina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- Toast de notificação interna -->
+<div class="toast-notif" id="toast-notif">
+  <div class="toast-icon">AGORA</div>
+  <div class="toast-content">
+    <div class="toast-title">Nova tarefa iniciada</div>
+    <div class="toast-body" id="toast-body">—</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     TELA PRINCIPAL
+══════════════════════════════════ -->
+<div id="view-home" class="view active">
+  <div class="safe-top"></div>
+
+  <!-- System header -->
+  <header class="sys-header">
+    <div class="sys-header-inner">
+      <div class="sys-id">
+        <span class="sys-id-value">K.I. ROTINA</span>
+      </div>
+      <div class="sys-date-block">
+        <span id="hdr-day"></span>
+        <span id="hdr-date"></span>
+      </div>
+      <div class="sys-actions">
+        <button class="pill-btn" onclick="showView('view-reminders')">lembretes</button>
+        <button class="icon-pill" onclick="showView('view-settings')">⚙</button>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Card da tarefa atual -->
+  <div class="now-card" id="now-card">
+    <div class="now-card-header">
+      <div class="now-tag">tarefa ativa</div>
+      <div class="countdown-pill" id="countdown-pill">—</div>
+    </div>
+    <div class="now-card-body">
+      <div class="now-time" id="now-time">—</div>
+      <div class="now-name" id="now-name">Carregando...</div>
+      <div class="now-subtasks" id="now-subtasks"></div>
+    </div>
+    <div class="now-footer">
+      <div class="next-info">
+        <span class="next-label-title">próxima</span>
+        <span id="next-label">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progresso do dia -->
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <span class="progress-label" id="progress-label">0 / 0</span>
+  </div>
+
+  <!-- Lista de tarefas -->
+  <div class="section-header">
+    <span>agenda do dia</span>
+    <button class="link-btn" onclick="showView('view-edit-today')">editar</button>
+  </div>
+
+  <ul class="task-list" id="task-list"></ul>
+
+  <!-- Banner instalar PWA (iOS) -->
+  <div class="install-banner hidden" id="install-banner">
+    <div class="install-icon">↑</div>
+    <div>
+      <b>Instalar na tela inicial</b><br>
+      <span class="small muted">Toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b></span>
+    </div>
+    <button class="install-close" onclick="this.parentElement.classList.add('hidden')">✕</button>
+  </div>
+
+  <div class="safe-bottom"></div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     TELA DE LEMBRETES
+══════════════════════════════════ -->
+<div id="view-reminders" class="view">
+  <div class="safe-top"></div>
+  <header class="top-bar">
+    <button class="back-btn" onclick="showView('view-home')">← voltar</button>
+    <span class="view-title">Lembretes</span>
+    <button class="icon-pill" id="btn-add-reminder">+</button>
+  </header>
+
+  <div class="section-header"><span>pendentes</span></div>
+  <ul class="task-list" id="reminder-list-pending"></ul>
+
+  <div class="section-header"><span class="muted">concluídos</span></div>
+  <ul class="task-list" id="reminder-list-done"></ul>
+
+  <div class="safe-bottom"></div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     TELA EDITAR HOJE
+══════════════════════════════════ -->
+<div id="view-edit-today" class="view">
+  <div class="safe-top"></div>
+  <header class="top-bar">
+    <button class="back-btn" onclick="showView('view-home')">← voltar</button>
+    <span class="view-title">Editar hoje</span>
+    <button class="link-btn danger" id="btn-reset-today">resetar</button>
+  </header>
+  <p class="info-bar">// Mudanças temporárias. Para rotina permanente → Configurações.</p>
+  <ul class="edit-list" id="edit-today-list"></ul>
+  <div class="edit-actions">
+    <button class="add-row-btn" id="btn-add-today">+ inserir horário</button>
+  </div>
+  <div class="safe-bottom"></div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     TELA CONFIGURAÇÕES
+══════════════════════════════════ -->
+<div id="view-settings" class="view">
+  <div class="safe-top"></div>
+  <header class="top-bar">
+    <button class="back-btn" onclick="showView('view-home')">← voltar</button>
+    <span class="view-title">Rotina base</span>
+    <button class="save-btn" id="btn-save-settings">salvar</button>
+  </header>
+  <p class="info-bar">// Rotina permanente por dia da semana. Toque em ▸ para subtarefas.</p>
+
+  <div class="day-tabs" id="day-tabs">
+    <button class="day-tab active" data-d="0">Seg</button>
+    <button class="day-tab" data-d="1">Ter</button>
+    <button class="day-tab" data-d="2">Qua</button>
+    <button class="day-tab" data-d="3">Qui</button>
+    <button class="day-tab" data-d="4">Sex</button>
+    <button class="day-tab" data-d="5">Sáb</button>
+    <button class="day-tab" data-d="6">Dom</button>
+  </div>
+
+  <ul class="edit-list" id="settings-list"></ul>
+  <div class="edit-actions">
+    <button class="add-row-btn" id="btn-add-settings">+ inserir horário</button>
+  </div>
+  <div class="safe-bottom"></div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     MODAL LEMBRETE
+══════════════════════════════════ -->
+<div id="reminder-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">Novo lembrete</div>
+    <input type="text" id="rm-text" placeholder="Registrar observação..." class="modal-input"/>
+    <div class="modal-row">
+      <input type="date" id="rm-date" class="modal-input half"/>
+      <input type="time" id="rm-time" class="modal-input half"/>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeReminderModal()">cancelar</button>
+      <button class="modal-confirm" id="btn-confirm-reminder">confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL SUBTAREFAS
+══════════════════════════════════ -->
+<div id="subtask-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">Subtarefas</div>
+    <div class="modal-task-label" id="sub-task-label"></div>
+    <ul class="subtask-edit-list" id="subtask-edit-list"></ul>
+    <button class="add-subtask-btn" id="btn-add-subtask">+ adicionar subtarefa</button>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeSubtaskModal()">fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
